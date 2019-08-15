@@ -359,19 +359,35 @@ fn write_opts_of(p: &Parser) -> String {
         } else {
             ""
         };
+        let vn = if let Some(ref names) = o.v.val_names {
+            names
+                .values()
+                .map(|n| format!("{}", n))
+                .collect::<Vec<_>>()
+                .join(".")
+        } else {
+            format!(" ")
+        };
+        // let vn = if let Some(vn_vec) = o.v.val_names {
+        //     format!("({})", vn_vec.iter().map(
+        //             |n| escape_value(*n)).collect::<Vec<String>>().join(" "))
+        // } else {
+        //     String::new()
+        // };
         let pv = if let Some(pv_vec) = o.possible_vals() {
-            format!(": :({})", pv_vec.iter().map(
+            format!("({})", pv_vec.iter().map(
                 |v| escape_value(*v)).collect::<Vec<String>>().join(" "))
         } else {
             String::new()
         };
         if let Some(short) = o.short() {
             let s = format!(
-                "'{conflicts}{multiple}-{arg}+[{help}]{possible_values}' \\",
+                "'{conflicts}{multiple}-{arg}+[{help}]:{value_name}:{possible_values}' \\",
                 conflicts = conflicts,
                 multiple = multiple,
                 arg = short,
                 possible_values = pv,
+                value_name = vn,
                 help = help
             );
 
@@ -380,11 +396,12 @@ fn write_opts_of(p: &Parser) -> String {
         }
         if let Some(long) = o.long() {
             let l = format!(
-                "'{conflicts}{multiple}--{arg}=[{help}]{possible_values}' \\",
+                "'{conflicts}{multiple}--{arg}=[{help}]:{value_name}:{possible_values}' \\",
                 conflicts = conflicts,
                 multiple = multiple,
                 arg = long,
                 possible_values = pv,
+                value_name = vn,
                 help = help
             );
 
